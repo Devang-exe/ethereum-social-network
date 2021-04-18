@@ -21,6 +21,7 @@ class Navbar extends Component {
             </small>
             { this.props.account
               ? <img
+                alt="account-avatar"
                 className='ml-2'
                 width='30'
                 height='30'
