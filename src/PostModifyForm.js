@@ -1,42 +1,53 @@
 import React, {Component} from 'react';
+import {Modal} from 'react-bootstrap';
 
 class PostModifyForm extends Component {
 
+  constructor(props) {
+		super(props);
+		this.state = {open: false};
+	}
+
   render() {
+
+    let handleOpen = () => {
+      this.setState({open: true});
+    }
+
+    let handleClose = () => {
+      this.setState({open: false});
+    }
+
+    let saveAndClose = () => {
+      this.props.modifyPost(this.props.post.postId, this.newPostContent.value);
+      handleClose();
+    }
+
     return (
       <div>
         <button className="btn btn-danger btn-sm float-right mr-3"
-          data-bs-toggle="modal"
-          data-bs-target="#editingModal">
+          onClick={handleOpen}>
         Edit
         </button>
 
-        <div className="modal fade" id="editingModal" tabIndex="-1" aria-labelledby="editingModalLabel" aria-hidden="true">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title" id="editingModalLabel">Modify Your Post</h5>
-                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div className="modal-body">
-                <input
-                  id="postContent"
-                  ref={(input) => {this.newPostContent = input}}
-                  className="form-control"
-                  value={this.props.post.content}
-                  required />
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" className="btn btn-primary"
-                  onClick={() => {
-                    this.props.modifyPost(this.props.post.postId, this.newPostContent);
-                  }}  
-                >Modify Post</button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Modal show={this.state.open} onHide={handleClose}>
+          <Modal.Header closeButton>
+            <Modal.Title>Modify your post</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+          <input
+            id="postContent"
+            ref={(input) => {this.newPostContent = input}}
+            className="form-control"
+            defaultValue={this.props.post.content}
+            required />
+          </Modal.Body>
+          <Modal.Footer>
+            <button type="button" className="btn btn-secondary" onClick={handleClose}>Close</button>
+            <button type="button" className="btn btn-primary"
+              onClick={saveAndClose}>Modify Post</button>
+          </Modal.Footer>
+        </Modal>
       </div>
     );
   }
