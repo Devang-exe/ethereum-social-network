@@ -1,4 +1,6 @@
-export const CONTRACT_ADDRESS = "0xf7cD57DDBf1770951aD783De8887876c94B06167"
+// Contract containing posts on the social network
+
+export const CONTRACT_ADDRESS = "0xf7cD57DDBf1770951aD783De8887876c94B06167";
 
 export const CONTRACT_ABI = [
   {
@@ -190,4 +192,89 @@ export const CONTRACT_ABI = [
     "stateMutability": "view",
     "type": "function"
   }
+];
+
+
+// Contract containing profiles of different users
+
+export const PROFILES_CONTRACT_ADDRESS = "";
+
+export const PROFILES_CONTRACT_ABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "profiles",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"internalType": "uint8",
+				"name": "age",
+				"type": "uint8"
+			},
+			{
+				"internalType": "string",
+				"name": "gender",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "profession",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "about",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_user",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "_name",
+				"type": "string"
+			},
+			{
+				"internalType": "uint8",
+				"name": "_age",
+				"type": "uint8"
+			},
+			{
+				"internalType": "string",
+				"name": "_gender",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_profession",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_about",
+				"type": "string"
+			}
+		],
+		"name": "setProfile",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
 ];
