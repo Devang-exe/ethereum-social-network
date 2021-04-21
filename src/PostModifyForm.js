@@ -36,7 +36,7 @@ class PostModifyForm extends Component {
           </Modal.Header>
           <Modal.Body>
           <input
-            id="postContent"
+            id="modifyContent"
             ref={(input) => {this.newPostContent = input}}
             className="form-control"
             defaultValue={this.props.post.content}

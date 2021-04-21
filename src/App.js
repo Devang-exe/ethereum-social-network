@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import assert from 'assert';
 import './App.css';
 import Web3 from 'web3';
 import {CONTRACT_ADDRESS, CONTRACT_ABI} from './config';
@@ -53,21 +54,31 @@ class App extends Component {
   async loadPosts() {
     this.setState({loading: true});
 
-    const postCount = await this.state.contract.methods.postCount().call();
-    this.setState({postCount});
+    let oldPostCount = parseInt(this.state.postCount);
 
-    this.setState({posts: []});
+    let newPostCount = await this.state.contract.methods.postCount().call();
+    newPostCount = parseInt(newPostCount);
 
-    for(let i=1; i<=postCount; i++) {
-      const post = await this.state.contract.methods.posts(i).call();
-      this.setState({posts: [...this.state.posts, post]});
+    for(let id = oldPostCount+1; id <= newPostCount; id++) {
+      await this.loadPost(id);
     }
 
-    this.setState({posts: 
-      this.state.posts.sort((a,b) => b.tip - a.tip)
+    this.setState({postCount: newPostCount});
+    this.setState({loading: false});
+  }
+
+  async loadPost(id) {
+    assert(typeof id === "number");
+
+    let post = await this.state.contract.methods.posts(id).call();
+
+    let object = {};
+    object[id] = post;
+    this.setState({
+      posts: Object.assign(this.state.posts, object)
     });
 
-    this.setState({loading: false});
+    // await loadProfile(post["author"]);
   }
 
   createPost(content) {
@@ -76,6 +87,8 @@ class App extends Component {
     this.state.contract.methods.createPost(content).send({from: this.state.account})
     .once("receipt", async (receipt) => {
       await this.loadPosts();
+      
+    console.log(this.state.posts);
       this.setState({loading: false});
     });
   }
@@ -83,9 +96,10 @@ class App extends Component {
   modifyPost(id, content) {
     this.setState({loading: true});
 
+    id = parseInt(id);
     this.state.contract.methods.modifyPost(id, content).send({from: this.state.account})
     .once("receipt", async (receipt) => {
-      await this.loadPosts();
+      await this.loadPost(id);
       this.setState({loading: false});
     });
   }
@@ -93,9 +107,10 @@ class App extends Component {
   tipPost(id, tip) {
     this.setState({loading: true});
 
+    id = parseInt(id);
     this.state.contract.methods.tipPost(id).send({from: this.state.account, value: tip})
     .once("receipt", async (receipt) => {
-      await this.loadPosts();
+      await this.loadPost(id);
       this.setState({loading: false});
     });
   }
@@ -107,12 +122,13 @@ class App extends Component {
       account: "",
       contract: null,
       postCount: 0,
-      posts: [],
+      posts: {},
       loading: true
     }
 
     this.loadAccount = this.loadAccount.bind(this);
     this.loadPosts = this.loadPosts.bind(this);
+    this.loadPost = this.loadPost.bind(this);
     this.createPost = this.createPost.bind(this);
     this.modifyPost = this.modifyPost.bind(this);
     this.tipPost = this.tipPost.bind(this);
@@ -130,7 +146,9 @@ class App extends Component {
             {/* Post creation form */}
             <PostCreateForm createPost={this.createPost} />
             {/* Posts list */}
-            { this.state.posts.map((post, key) => {
+            { Object.values(this.state.posts)
+              .sort((a,b) => b["tip"] - a["tip"])
+              .map((post, key) => {
                   return (<Post
                           currentAccount={this.state.account}
                           post={post}
