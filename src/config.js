@@ -204,47 +204,13 @@ export const PROFILES_CONTRACT_ABI = [
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "profiles",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "name",
-				"type": "string"
-			},
-			{
-				"internalType": "uint8",
-				"name": "age",
-				"type": "uint8"
-			},
-			{
-				"internalType": "string",
-				"name": "gender",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "profession",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "about",
-				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
 				"name": "_user",
 				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "_displayName",
+				"type": "string"
 			},
 			{
 				"internalType": "string",
@@ -253,8 +219,18 @@ export const PROFILES_CONTRACT_ABI = [
 			},
 			{
 				"internalType": "uint8",
-				"name": "_age",
+				"name": "_day",
 				"type": "uint8"
+			},
+			{
+				"internalType": "uint8",
+				"name": "_month",
+				"type": "uint8"
+			},
+			{
+				"internalType": "uint16",
+				"name": "_year",
+				"type": "uint16"
 			},
 			{
 				"internalType": "string",
@@ -275,6 +251,67 @@ export const PROFILES_CONTRACT_ABI = [
 		"name": "setProfile",
 		"outputs": [],
 		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "profiles",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "displayName",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"components": [
+					{
+						"internalType": "uint8",
+						"name": "day",
+						"type": "uint8"
+					},
+					{
+						"internalType": "uint8",
+						"name": "month",
+						"type": "uint8"
+					},
+					{
+						"internalType": "uint16",
+						"name": "year",
+						"type": "uint16"
+					}
+				],
+				"internalType": "struct UsersProfileManager.Birthday",
+				"name": "birthday",
+				"type": "tuple"
+			},
+			{
+				"internalType": "string",
+				"name": "gender",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "profession",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "about",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	}
 ];
