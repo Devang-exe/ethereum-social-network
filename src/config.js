@@ -197,7 +197,7 @@ export const CONTRACT_ABI = [
 
 // Contract containing profiles of different users
 
-export const PROFILES_CONTRACT_ADDRESS = "";
+export const PROFILES_CONTRACT_ADDRESS = "0x80FACBAAf9dBa32217E96D08f20a36dBb0bD83e2";
 
 export const PROFILES_CONTRACT_ABI = [
 	{
