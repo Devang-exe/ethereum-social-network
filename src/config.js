@@ -239,6 +239,11 @@ export const PROFILES_CONTRACT_ABI = [
 			},
 			{
 				"internalType": "string",
+				"name": "_email",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
 				"name": "_profession",
 				"type": "string"
 			},
@@ -298,6 +303,11 @@ export const PROFILES_CONTRACT_ABI = [
 			{
 				"internalType": "string",
 				"name": "gender",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "email",
 				"type": "string"
 			},
 			{

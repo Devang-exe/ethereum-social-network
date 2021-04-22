@@ -15,6 +15,7 @@ contract UsersProfileManager {
         string name;
         Birthday birthday;
         string gender;
+        string email;
         string profession;
         string about;
     }
@@ -29,6 +30,7 @@ contract UsersProfileManager {
         uint8 _month,
         uint16 _year,
         string memory _gender,
+        string memory _email,
         string memory _profession,
         string memory _about)
     public {
@@ -40,6 +42,7 @@ contract UsersProfileManager {
             _name,
             Birthday(_day, _month, _year),
             _gender,
+            _email,
             _profession,
             _about);
         profiles[_user] = _profile;
