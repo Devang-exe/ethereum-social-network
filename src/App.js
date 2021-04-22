@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
+import {BrowserRouter, Switch, Route} from 'react-router-dom';
 import assert from 'assert';
 import './App.css';
 import Web3 from 'web3';
-import {CONTRACT_ADDRESS, CONTRACT_ABI} from './config';
-import Navbar from './Navbar';
-import PostCreateForm from './PostCreateForm';
-import Post from './Post';
+import {CONTRACT_ADDRESS, CONTRACT_ABI, PROFILES_CONTRACT_ADDRESS, PROFILES_CONTRACT_ABI} from './config';
+import NavigationBar from './components/NavigationBar';
+import Home from './components/Home';
+import User from './components/User';
 
 class App extends Component {
 
@@ -17,17 +18,21 @@ class App extends Component {
     const ethereum = window.ethereum;
 
     if(ethereum && ethereum.isMetaMask) {
-      await this.loadAccount();
-
-      ethereum.on("accountsChanged", await this.loadAccount);
-      ethereum.on("chainChanged", function(chainId) {
-        window.location.reload();
-      });
 
       window.web3 = new Web3(ethereum);
 
       const contract = new window.web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
       this.setState({contract});
+
+      const profilesContract = new window.web3.eth.Contract(PROFILES_CONTRACT_ABI, PROFILES_CONTRACT_ADDRESS);
+      this.setState({profilesContract});
+
+      await this.loadAccount();
+
+      ethereum.on("accountsChanged", await this.loadAccount);
+      ethereum.on("chainChanged", function() {
+        window.location.reload();
+      });
 
       await this.loadPosts();
 
@@ -39,15 +44,13 @@ class App extends Component {
     }
   }
 
-  async loadAccount(accounts) {
+  async loadAccount() {
     this.setState({loading: true});
-    if(accounts) {
-      this.setState({account: accounts[0]});
-    }
-    else {
-      const accounts = await window.ethereum.request({method: "eth_requestAccounts"});
-      this.setState({account: accounts[0]});
-    }
+
+    const accounts = await window.ethereum.request({method: "eth_requestAccounts"});
+    this.setState({account: accounts[0]});
+    await this.loadProfile(this.state.account);
+
     this.setState({loading: false});
   }
 
@@ -71,14 +74,36 @@ class App extends Component {
     assert(typeof id === "number");
 
     let post = await this.state.contract.methods.posts(id).call();
-
     let object = {};
     object[id] = post;
+
     this.setState({
       posts: Object.assign(this.state.posts, object)
     });
 
-    // await loadProfile(post["author"]);
+    await this.loadProfile(post["author"]);
+  }
+
+  async loadProfile(address) {
+    assert(typeof address === "string");
+    assert(address.length === 42);
+    assert(address.slice(0,2) === "0x");
+
+    address = address.toLowerCase();
+
+    if(!(this.state.userProfiles[address])) {
+
+      let profile = await this.state.profilesContract.methods.profiles(address).call();
+      let object = {};
+      object[address] = profile;
+
+      this.setState({
+        userProfiles: Object.assign(this.state.userProfiles, object)
+      });
+    
+      console.log("Loaded for address: ", address);
+      console.log(this.state.userProfiles[address]);
+    }
   }
 
   createPost(content) {
@@ -87,8 +112,6 @@ class App extends Component {
     this.state.contract.methods.createPost(content).send({from: this.state.account})
     .once("receipt", async (receipt) => {
       await this.loadPosts();
-      
-    console.log(this.state.posts);
       this.setState({loading: false});
     });
   }
@@ -121,14 +144,17 @@ class App extends Component {
     this.state = {
       account: "",
       contract: null,
+      profilesContract: null,
       postCount: 0,
       posts: {},
+      userProfiles: {},
       loading: true
     }
 
     this.loadAccount = this.loadAccount.bind(this);
     this.loadPosts = this.loadPosts.bind(this);
     this.loadPost = this.loadPost.bind(this);
+    this.loadProfile = this.loadProfile.bind(this);
     this.createPost = this.createPost.bind(this);
     this.modifyPost = this.modifyPost.bind(this);
     this.tipPost = this.tipPost.bind(this);
@@ -136,31 +162,54 @@ class App extends Component {
 
   render() {
     return(
-      <div>
-        {/* Navbar at the top */}
-        <Navbar account={this.state.account} />
+      <BrowserRouter>
 
-        { this.state.loading ?
-          <div id="loader" className="text-center mt-5"><p>Loading...</p></div> :
-          <div>
-            {/* Post creation form */}
-            <PostCreateForm createPost={this.createPost} />
-            {/* Posts list */}
-            { Object.values(this.state.posts)
-              .sort((a,b) => b["tip"] - a["tip"])
-              .map((post, key) => {
-                  return (<Post
-                          currentAccount={this.state.account}
-                          post={post}
-                          key={key}
-                          modifyPost={this.modifyPost}
-                          tipPost={this.tipPost}
-                        />)
-                })
+        <NavigationBar account={this.state.account} />
+        <div className="mt-4"></div>
+        <br />
+
+        <Switch>
+
+          <Route path="/" exact component={() =>
+              <Home
+                loading={this.state.loading}
+                account={this.state.account}
+                posts={this.state.posts}
+                userProfiles={this.state.userProfiles}
+                createPost={this.createPost}
+                modifyPost={this.modifyPost}
+                tipPost={this.tipPost}
+              />
             }
-          </div>
-        }
-      </div>
+          />
+
+          <Route path="/me" exact component={() =>
+              <User
+                loading={this.state.loading}
+                account={this.state.account}
+                posts={this.state.posts}
+                userAddress={this.state.account}
+                userProfile={this.state.userProfiles[this.state.account.toLowerCase()]}
+                /* modifyProfile={this.modifyProfile} */
+              />
+            }
+          />
+
+          <Route path="/user/:address" exact component={(props) =>
+              <User
+                loading={this.state.loading}
+                account={this.state.account}
+                posts={this.state.posts}
+                userAddress={props.match.params.address}
+                userProfile={this.state.userProfiles[props.match.params.address.toLowerCase()]}
+                /* modifyProfile={this.modifyProfile} */
+              />
+            }
+          />
+
+        </Switch>
+
+      </BrowserRouter>
     );
   }
 }
