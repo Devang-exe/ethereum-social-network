@@ -27,14 +27,14 @@ class App extends Component {
       const profilesContract = new window.web3.eth.Contract(PROFILES_CONTRACT_ABI, PROFILES_CONTRACT_ADDRESS);
       this.setState({profilesContract});
 
-      this.setState({contractsLoaded: true});
-
       await this.loadAccount();
 
       ethereum.on("accountsChanged", await this.loadAccount);
       ethereum.on("chainChanged", function() {
         window.location.reload();
       });
+
+      this.setState({contractsLoaded: true});
 
       await this.loadPosts();
 
