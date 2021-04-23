@@ -18,11 +18,6 @@ class PostModifyForm extends Component {
       this.setState({open: false});
     }
 
-    let saveAndClose = () => {
-      this.props.modifyPost(this.props.post.postId, this.newPostContent.value);
-      handleClose();
-    }
-
     return (
       <div>
         <button className="btn btn-danger btn-sm float-right mr-3"
@@ -31,22 +26,32 @@ class PostModifyForm extends Component {
         </button>
 
         <Modal show={this.state.open} onHide={handleClose}>
+
           <Modal.Header closeButton>
             <Modal.Title>Modify your post</Modal.Title>
           </Modal.Header>
+
           <Modal.Body>
-          <input
-            id="modifyContent"
-            ref={(input) => {this.newPostContent = input}}
-            className="form-control"
-            defaultValue={this.props.post.content}
-            required />
+            <form id="modifyForm" onSubmit={(event) => {
+              event.preventDefault();
+              this.props.modifyPost(this.props.post.postId, this.newPostContent.value);
+              handleClose();
+            }}>
+              <input
+                id="modifyContent"
+                ref={(input) => {this.newPostContent = input}}
+                className="form-control"
+                defaultValue={this.props.post.content}
+                required
+              />
+            </form>
           </Modal.Body>
+
           <Modal.Footer>
             <button type="button" className="btn btn-secondary" onClick={handleClose}>Close</button>
-            <button type="button" className="btn btn-primary"
-              onClick={saveAndClose}>Modify Post</button>
+            <button type="submit" form="modifyForm" className="btn btn-primary">Modify Post</button>
           </Modal.Footer>
+
         </Modal>
       </div>
     );
