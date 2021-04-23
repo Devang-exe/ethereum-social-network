@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {Navbar, Nav} from 'react-bootstrap';
+import {Link} from 'react-router-dom';
 import Identicon from 'identicon.js';
 
 class NavigationBar extends Component {
@@ -15,9 +16,9 @@ class NavigationBar extends Component {
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="ml-auto">
 
-            <Nav.Link href="/">Home</Nav.Link>
+            <Nav.Link as={Link} to="/">Home</Nav.Link>
 
-            <Nav.Link href="/me">My Profile</Nav.Link>
+            <Nav.Link as={Link} to="/me">My Profile</Nav.Link>
 
             { this.props.account
               ? <img

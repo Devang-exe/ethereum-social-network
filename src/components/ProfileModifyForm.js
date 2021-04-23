@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Modal} from 'react-bootstrap';
 
-class PostModifyForm extends Component {
+class ProfileModifyForm extends Component {
 
   constructor(props) {
 		super(props);
@@ -19,33 +19,32 @@ class PostModifyForm extends Component {
     }
 
     let saveAndClose = () => {
-      this.props.modifyPost(this.props.post.postId, this.newPostContent.value);
+      // this.props.modifyPost(this.props.post.postId, this.newPostContent.value);
       handleClose();
     }
 
     return (
       <div>
-        <button className="btn btn-danger btn-sm float-right mr-3"
+        <button className="btn btn-danger float-right"
           onClick={handleOpen}>
-        Edit
+        Edit Profile
         </button>
 
         <Modal show={this.state.open} onHide={handleClose}>
           <Modal.Header closeButton>
-            <Modal.Title>Modify your post</Modal.Title>
+            <Modal.Title>Edit your profile</Modal.Title>
           </Modal.Header>
           <Modal.Body>
           <input
-            id="modifyContent"
-            ref={(input) => {this.newPostContent = input}}
-            className="form-control"
-            defaultValue={this.props.post.content}
+            id="Name"
+            ref={(input) => {this.name = input}}
+            // defaultValue={this.props.post.content}
             required />
           </Modal.Body>
           <Modal.Footer>
             <button type="button" className="btn btn-secondary" onClick={handleClose}>Close</button>
             <button type="button" className="btn btn-primary"
-              onClick={saveAndClose}>Modify Post</button>
+              onClick={saveAndClose}>Save</button>
           </Modal.Footer>
         </Modal>
       </div>
@@ -53,4 +52,4 @@ class PostModifyForm extends Component {
   }
 }
 
-export default PostModifyForm;
+export default ProfileModifyForm;

@@ -27,6 +27,8 @@ class App extends Component {
       const profilesContract = new window.web3.eth.Contract(PROFILES_CONTRACT_ABI, PROFILES_CONTRACT_ADDRESS);
       this.setState({profilesContract});
 
+      this.setState({contractsLoaded: true});
+
       await this.loadAccount();
 
       ethereum.on("accountsChanged", await this.loadAccount);
@@ -100,9 +102,6 @@ class App extends Component {
       this.setState({
         userProfiles: Object.assign(this.state.userProfiles, object)
       });
-    
-      console.log("Loaded for address: ", address);
-      console.log(this.state.userProfiles[address]);
     }
   }
 
@@ -138,6 +137,35 @@ class App extends Component {
     });
   }
 
+  modifyProfile(
+    address,
+    displayName,
+    name,
+    day,
+    month,
+    year,
+    gender,
+    email,
+    profession,
+    about) {
+
+      this.state.profilesContract.methods.setProfile(
+        address,
+        displayName,
+        name,
+        day,
+        month,
+        year,
+        gender,
+        email,
+        profession,
+        about
+      ).send({from: this.state.account})
+      .once("receipt", async(receipt) => {
+        await this.loadProfile(address);
+      })
+    }
+
   constructor(props) {
     super(props);
 
@@ -148,16 +176,18 @@ class App extends Component {
       postCount: 0,
       posts: {},
       userProfiles: {},
+      contractsLoaded: false,
       loading: true
     }
 
     this.loadAccount = this.loadAccount.bind(this);
     this.loadPosts = this.loadPosts.bind(this);
     this.loadPost = this.loadPost.bind(this);
-    this.loadProfile = this.loadProfile.bind(this);
     this.createPost = this.createPost.bind(this);
     this.modifyPost = this.modifyPost.bind(this);
     this.tipPost = this.tipPost.bind(this);
+    this.loadProfile = this.loadProfile.bind(this);
+    this.modifyProfile = this.modifyProfile.bind(this);
   }
 
   render() {
@@ -165,12 +195,12 @@ class App extends Component {
       <BrowserRouter>
 
         <NavigationBar account={this.state.account} />
-        <div className="mt-4"></div>
+        <div className="mt-5"></div>
         <br />
 
         <Switch>
 
-          <Route path="/" exact component={() =>
+          <Route path="/" exact render={() =>
               <Home
                 loading={this.state.loading}
                 account={this.state.account}
@@ -183,27 +213,34 @@ class App extends Component {
             }
           />
 
-          <Route path="/me" exact component={() =>
+          <Route path="/me" exact render={() =>
               <User
                 loading={this.state.loading}
                 account={this.state.account}
                 posts={this.state.posts}
                 userAddress={this.state.account}
                 userProfile={this.state.userProfiles[this.state.account.toLowerCase()]}
-                /* modifyProfile={this.modifyProfile} */
+                modifyPost={this.modifyPost}
+                tipPost={this.tipPost}
+                modifyProfile={this.modifyProfile}
               />
             }
           />
 
-          <Route path="/user/:address" exact component={(props) =>
-              <User
+          <Route path="/user/:address" exact render={(props) => {
+              if(this.state.contractsLoaded)
+                this.loadProfile(props.match.params.address);
+              return <User
                 loading={this.state.loading}
                 account={this.state.account}
                 posts={this.state.posts}
                 userAddress={props.match.params.address}
                 userProfile={this.state.userProfiles[props.match.params.address.toLowerCase()]}
-                /* modifyProfile={this.modifyProfile} */
-              />
+                modifyPost={this.modifyPost}
+                tipPost={this.tipPost}
+                modifyProfile={this.modifyProfile}
+              />;
+            }
             }
           />
 
