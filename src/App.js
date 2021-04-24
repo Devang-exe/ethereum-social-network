@@ -86,15 +86,14 @@ class App extends Component {
     await this.loadProfile(post["author"]);
   }
 
-  async loadProfile(address) {
+  async loadProfile(address, force) {
     assert(typeof address === "string");
     assert(address.length === 42);
     assert(address.slice(0,2) === "0x");
 
     address = address.toLowerCase();
-
-    if(!(this.state.userProfiles[address])) {
-
+    
+    if(force) {
       let profile = await this.state.profilesContract.methods.profiles(address).call();
       let object = {};
       object[address] = profile;
@@ -103,6 +102,19 @@ class App extends Component {
         userProfiles: Object.assign(this.state.userProfiles, object)
       });
     }
+    else {
+      if(!(this.state.userProfiles[address])) {
+
+        let profile = await this.state.profilesContract.methods.profiles(address).call();
+        let object = {};
+        object[address] = profile;
+
+        this.setState({
+          userProfiles: Object.assign(this.state.userProfiles, object)
+        });
+    }
+    }
+    
   }
 
   createPost(content) {
@@ -162,7 +174,7 @@ class App extends Component {
         about
       ).send({from: this.state.account})
       .once("receipt", async(receipt) => {
-        await this.loadProfile(address);
+        await this.loadProfile(address, true);
       })
     }
 

@@ -97,8 +97,9 @@ class User extends Component {
             {this.props.userAddress.toLowerCase() === this.props.account.toLowerCase()
             ? <div className="mt-4">
                 <ProfileModifyForm
+                  userAddress={this.props.userAddress}
                   profileData={this.props.userProfile}
-                  modifyProfile={this.modifyProfile}
+                  modifyProfile={this.props.modifyProfile}
                 />
                 <br />
                 <br />
